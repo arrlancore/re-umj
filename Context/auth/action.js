@@ -19,11 +19,11 @@ export const actionLogin = (dispatch, payload, opt) => {
     if (response.status <= 201) {
       const user = {
         token: token,
-        jadwal,
         ...data
       };
       AsyncStorage.setItem('isLogin', 'true');
       AsyncStorage.setItem('user', JSON.stringify(user));
+      AsyncStorage.setItem('jadwal', JSON.stringify(jadwal));
       opt.setLogin(true);
       opt.setUser(user);
       dispatch({

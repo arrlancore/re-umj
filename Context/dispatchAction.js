@@ -1,7 +1,9 @@
-import { message } from 'antd';
-// import logout from './logout'
-
-export default async function dispatchAction(dispatch, actionType, action) {
+export default async function dispatchAction(
+  dispatch,
+  actionType,
+  action,
+  setNotifSnackbar
+) {
   const dev = process.env.NODE_ENV === 'development';
   const onRequest = '_REQUEST';
   const onFailure = '_FAILURE';
@@ -20,7 +22,7 @@ export default async function dispatchAction(dispatch, actionType, action) {
     //     logout()
     //   })
     // } else {
-    message.error(textMessage);
+    setNotifSnackbar && setNotifSnackbar(`${textMessage} ${response.status}`);
     // }
     dispatch({ type: actionType + onFailure, error });
   }

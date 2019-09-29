@@ -1,83 +1,39 @@
-import React from 'react';
 import { Platform } from 'react-native';
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 
-import TabBarIcon from '../components/TabBarIcon';
 import LoginScreen from '../screens/LoginScreen';
-import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import HomeScreen from '../screens/HomeScreen';
+import JadwalScreen from '../screens/JadwalScreen';
+import JadwalDetailScreen from '../screens/JadwalDetailPage';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
   default: {}
 });
 
-const HomeStack = createStackNavigator(
+const PublicStack = createStackNavigator(
   {
     Login: LoginScreen
   },
   config
 );
 
-HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  )
-};
+PublicStack.path = '';
 
-HomeStack.path = '';
-
-const LinksStack = createStackNavigator(
+const PrivateStack = createStackNavigator(
   {
-    Links: LinksScreen
+    Home: HomeScreen,
+    Jadwal: JadwalScreen,
+    JadwalDetail: JadwalDetailScreen
   },
   config
 );
 
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
-    />
-  )
-};
-
-LinksStack.path = '';
-
-const SettingsStack = createStackNavigator(
-  {
-    Settings: SettingsScreen,
-    LinksPage: LinksScreen
-  },
-  config
-);
-
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
-    />
-  )
-};
-
-SettingsStack.path = '';
+PrivateStack.path = '';
 
 const tabNavigator = createSwitchNavigator({
-  HomeStack,
-  LinksStack,
-  SettingsStack
+  PublicStack,
+  PrivateStack
 });
 
 tabNavigator.path = '';

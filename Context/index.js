@@ -1,12 +1,24 @@
 import React from 'react';
+import { AsyncStorage } from 'react-native';
 import { node, func } from 'prop-types';
 
 export const DataContext = React.createContext();
 export const AuthContext = React.createContext();
+export const SnackbarContext = React.createContext();
+
+export const SnackbarProvider = props => {
+  const [message, setMessage] = React.useState('');
+  return (
+    <SnackbarContext.Provider value={[message, setMessage]}>
+      {props.children}
+    </SnackbarContext.Provider>
+  );
+};
+SnackbarProvider.propTypes = { children: node };
 
 export const DataProvider = ({ children, reducer }) => {
   const [store, dispatch] = React.useReducer(reducer, {});
-  console.log('store', store);
+  console.log('store', JSON.stringify(store));
   const [state, setState] = React.useState({ isLoaded: false });
   React.useEffect(() => {
     dispatch({ type: '@init' });
@@ -21,8 +33,20 @@ export const DataProvider = ({ children, reducer }) => {
 DataProvider.propTypes = { children: node, reducer: func };
 
 export const AuthProvider = props => {
-  const [login, setLogin] = React.useState(false);
+  // const dataUser = await AsyncStorage.getItem('user');
+  const [login, setLogin] = React.useState(null);
   const [user, setUser] = React.useState(null);
+  const prevLogin = usePrevious(login);
+  React.useEffect(() => {
+    if (login !== prevLogin) {
+      AsyncStorage.getItem('isLogin').then(data => {
+        setLogin(!!data);
+      });
+      AsyncStorage.getItem('user').then(data => {
+        setUser(JSON.parse(data));
+      });
+    }
+  });
   return (
     <AuthContext.Provider value={{ login, user, setLogin, setUser }}>
       {props.children}

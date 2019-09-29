@@ -1,7 +1,7 @@
 import React from 'react';
 import { object } from 'prop-types';
-import axios from 'axios';
-import config from '../config';
+import api from '../helper/api';
+import Layout from '../components/layout';
 import {
   Image,
   Platform,
@@ -10,31 +10,44 @@ import {
   View,
   AsyncStorage
 } from 'react-native';
-import { AuthContext, usePrevious } from '../Context';
+import { AuthContext, usePrevious, SnackbarContext } from '../Context';
 import { Button, TextInput, Title } from 'react-native-paper';
 
-const LogoImage = require('../assets/images/logo.png');
+const LogoImage = require('../assets/images/logo-transparent.png');
+const BgImage = require('../assets/images/bgapp.png');
 
 export default function HomeScreen(props) {
   const { login, setLogin, setUser } = React.useContext(AuthContext);
-  const [values, setValues] = React.useState({});
+  const [values, setValues] = React.useState({
+    email: '2015477019@ftumj.ac.id',
+    password: 'ftumj2019'
+  });
   const [loading, setLoading] = React.useState(false);
   const { navigate } = props.navigation;
+  const [, setSnackbar] = React.useContext(SnackbarContext);
 
   const prevLogin = usePrevious(login);
   React.useEffect(() => {
-    if (login && !prevLogin) navigate('Homepage');
+    if (login && !prevLogin) navigate('Home');
   });
 
   const setValue = key => value => {
     setValues({ ...values, [key]: value });
   };
 
+  const buttonDisabled = () =>
+    !!(
+      values.email &&
+      values.password &&
+      values.email.length > 3 &&
+      values.password.length > 5
+    );
+
   const userLogin = async () => {
     setLoading(true);
-    const url = config.baseUrl + '/api/auth/login';
+    const pathApi = '/api/auth/login';
     try {
-      const response = await axios.post(url, values, { timeout: 30000 });
+      const response = await api.post(pathApi, values, { timeout: 30000 });
       let { data, token, jadwal } = response.data;
       if (data.role === 'staf') {
         throw new Error('You dont have permission to access this resource');
@@ -42,11 +55,11 @@ export default function HomeScreen(props) {
       if (response.status <= 201) {
         const user = {
           token: token,
-          jadwal,
           ...data
         };
         AsyncStorage.setItem('isLogin', 'true');
         AsyncStorage.setItem('user', JSON.stringify(user));
+        AsyncStorage.setItem('jadwal', JSON.stringify(jadwal));
         setLogin(true);
         setUser(user);
         setLoading(false);
@@ -54,12 +67,15 @@ export default function HomeScreen(props) {
         throw new Error('An error has been occured during the login');
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      setLoading(false);
+      setSnackbar(error.message);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <Layout>
+      <Image source={BgImage} style={styles.backgroundImage} />
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -75,6 +91,8 @@ export default function HomeScreen(props) {
           mode="flat"
           label="Email"
           value={values.email}
+          autoCompleteType="email"
+          keyboardType="email-address"
         />
         <TextInput
           onChangeText={value => setValue('password')(value)}
@@ -83,6 +101,8 @@ export default function HomeScreen(props) {
           label="Password"
           value={values.password}
           secureTextEntry={true}
+          autoCompleteType="password"
+          on
         />
         <Button
           contentStyle={{ marginTop: 5 }}
@@ -90,12 +110,12 @@ export default function HomeScreen(props) {
           mode="contained"
           loading={loading}
           onPress={userLogin}
-          disabled={true}
+          disabled={!buttonDisabled()}
         >
           Login
         </Button>
       </ScrollView>
-    </View>
+    </Layout>
   );
 }
 
@@ -109,8 +129,13 @@ HomeScreen.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1
+  },
+  backgroundImage: {
     flex: 1,
-    backgroundColor: '#fff'
+    resizeMode: 'cover',
+    position: 'absolute',
+    height: '100%'
   },
   developmentModeText: {
     marginBottom: 20,
