@@ -63,6 +63,7 @@ export default function HomeScreen(props) {
         setLogin(true);
         setUser(user);
         setLoading(false);
+        setSnackbar(`Hi, ${user.firstName}`);
       } else {
         throw new Error('An error has been occured during the login');
       }

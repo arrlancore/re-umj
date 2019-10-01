@@ -1,20 +1,26 @@
 import React from 'react';
+import { object } from 'prop-types';
 import { ScrollView, StyleSheet, AsyncStorage } from 'react-native';
 import { List } from 'react-native-paper';
 import headerStyle from '../components/headerStyle';
 import Layout from '../components/layout';
-import { usePrevious } from '../Context';
+import { usePrevious, AuthContext } from '../Context';
 
 export default function JadwalScreen({ navigation }) {
   const [jadwal, setJadwal] = React.useState(null);
   const [jadwalToday, setJadwalToday] = React.useState([]);
   const [expanded, setExpanded] = React.useState('');
+
+  const { user } = React.useContext(AuthContext);
+
   const prevJadwal = usePrevious(jadwal);
 
   async function getJadwal() {
     const jadwalData = await AsyncStorage.getItem('jadwal');
     return JSON.parse(jadwalData);
   }
+
+  const isMahasiswa = () => user.role === 'mahasiswa';
 
   const handlePress = key => {
     if (key === expanded) {
@@ -25,7 +31,7 @@ export default function JadwalScreen({ navigation }) {
 
   const handleItemPress = jadwalData =>
     navigation.navigate({
-      routeName: 'JadwalDetail',
+      routeName: isMahasiswa() ? 'JadwalDetail' : 'Pertemuan',
       params: jadwalData
     });
 
@@ -131,11 +137,13 @@ export default function JadwalScreen({ navigation }) {
 }
 
 JadwalScreen.navigationOptions = headerStyle('Jadwal');
-
+JadwalScreen.propTypes = { navigation: object };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 15,
+    paddingLeft: 2,
+    paddingRight: 2,
     backgroundColor: '#fff'
   },
   card: {

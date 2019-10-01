@@ -14,8 +14,8 @@ export default function HomeScreen(props) {
       onPress: () => props.navigation.navigate('Jadwal')
     },
     {
-      title: 'Perkuliahan',
-      onPress: () => props.navigation.navigate('Perkuliahan')
+      title: 'Laporan Presensi',
+      onPress: () => props.navigation.navigate('LaporanPresensi')
     }
   ];
   return (
@@ -41,6 +41,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 15,
+    paddingLeft: 2,
+    paddingRight: 2,
     backgroundColor: '#fff'
   },
   card: {

@@ -8,7 +8,9 @@ export const actionTypes = {
   PRESENSI_MAHASISWA: 'PRESENSI_MAHASISWA',
   PRESENSI_MAHASISWA_SUCCESS: 'PRESENSI_MAHASISWA_SUCCESS',
   LIST_PRESENSI_MAHASISWA: 'LIST_PRESENSI_MAHASISWA',
-  LIST_PRESENSI_MAHASISWA_SUCCESS: 'LIST_PRESENSI_MAHASISWA_SUCCESS'
+  LIST_PRESENSI_MAHASISWA_SUCCESS: 'LIST_PRESENSI_MAHASISWA_SUCCESS',
+  REPORT_PRESENSI_MAHASISWA: 'REPORT_PRESENSI_MAHASISWA',
+  REPORT_PRESENSI_MAHASISWA_SUCCESS: 'REPORT_PRESENSI_MAHASISWA_SUCCESS'
 };
 
 // actions are where most of the business logic takes place
@@ -190,7 +192,7 @@ export const getReport = (dispatch, params) => async setNotif => {
     if (response.status <= 204) {
       let data = response.data;
       dispatch({
-        type: actionTypes.LIST_PRESENSI_MAHASISWA_SUCCESS,
+        type: actionTypes.REPORT_PRESENSI_MAHASISWA_SUCCESS,
         data
       });
     } else {
@@ -200,7 +202,7 @@ export const getReport = (dispatch, params) => async setNotif => {
   };
   dispatchAction(
     dispatch,
-    actionTypes.LIST_PRESENSI_MAHASISWA,
+    actionTypes.REPORT_PRESENSI_MAHASISWA,
     action,
     setNotif
   );

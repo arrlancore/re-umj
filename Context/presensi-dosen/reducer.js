@@ -26,3 +26,6 @@ export const listPresensiDosenReducer = (state = null, action) =>
 
 export const presensiDosenReducer = (state = null, action) =>
   setDataReducer(state, action, actionTypes.PRESENSI_DOSEN_SUCCESS);
+
+export const reportPresensiDosenReducer = (state = null, action) =>
+  setDataReducer(state, action, actionTypes.REPORT_PRESENSI_DOSEN_SUCCESS);

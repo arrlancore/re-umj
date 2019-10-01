@@ -5,7 +5,6 @@ import Snackbar from '../components/snackbar';
 import { SnackbarContext } from '../Context';
 
 const Layout = ({ children, ...rest }) => {
-  console.log('TCL: Layout -> rest', rest);
   const [message] = React.useContext(SnackbarContext);
   return (
     <View style={{ flex: 1 }} {...rest}>

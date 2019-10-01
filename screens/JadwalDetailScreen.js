@@ -134,6 +134,7 @@ export default function JadwalDetailScreen({ navigation }) {
       const payload = {
         jadwal: params._id,
         lokasi: location,
+        statusPresensi: 'hadir',
         kunciKelas
       };
       ambilPresensi(dispatch, payload)(setSnackbar);
@@ -253,6 +254,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 15,
+    paddingLeft: 2,
+    paddingRight: 2,
     backgroundColor: '#fff'
   },
   contentContainer: {

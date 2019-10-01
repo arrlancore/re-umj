@@ -1,6 +1,7 @@
 import React from 'react';
 import { AsyncStorage } from 'react-native';
 import { node, func } from 'prop-types';
+import log from '../helper/prettyLog';
 
 export const DataContext = React.createContext();
 export const AuthContext = React.createContext();
@@ -18,7 +19,7 @@ SnackbarProvider.propTypes = { children: node };
 
 export const DataProvider = ({ children, reducer }) => {
   const [store, dispatch] = React.useReducer(reducer, {});
-  console.log('store', JSON.stringify(store));
+  log(store);
   const [state, setState] = React.useState({ isLoaded: false });
   React.useEffect(() => {
     dispatch({ type: '@init' });

@@ -7,6 +7,8 @@ import dispatchAction from '../dispatchAction';
 export const actionTypes = {
   PRESENSI_DOSEN: 'PRESENSI_DOSEN',
   PRESENSI_DOSEN_SUCCESS: 'PRESENSI_DOSEN_SUCCESS',
+  REPORT_PRESENSI_DOSEN: 'REPORT_PRESENSI_DOSEN',
+  REPORT_PRESENSI_DOSEN_SUCCESS: 'REPORT_PRESENSI_DOSEN_SUCCESS',
   LIST_PRESENSI_DOSEN: 'LIST_PRESENSI_DOSEN',
   LIST_PRESENSI_DOSEN_SUCCESS: 'LIST_PRESENSI_DOSEN_SUCCESS'
 };
@@ -129,4 +131,96 @@ export const remove = (dispatch, params) => async setNotif => {
     }
   };
   dispatchAction(dispatch, actionTypes.PRESENSI_DOSEN, action, setNotif);
+};
+
+export const mulaiKelas = (dispatch, payload, params) => async setNotif => {
+  const user = await getUser();
+  const path = moduleRoutes + '/mulai-kelas';
+  const action = async () => {
+    const response = await Api.post(path, payload, {
+      params,
+      headers: { Authorization: user.token }
+    });
+    if (response.status <= 204) {
+      let data = response.data;
+      dispatch({
+        type: actionTypes.PRESENSI_DOSEN_SUCCESS,
+        data
+      });
+    } else {
+      const message = response.data && response.data.message;
+      throw new Error(message || 'An error has been occured');
+    }
+  };
+  dispatchAction(dispatch, actionTypes.PRESENSI_DOSEN, action, setNotif);
+};
+
+export const tutupKelas = (dispatch, params) => async setNotif => {
+  const user = await getUser();
+  const path = moduleRoutes + '/tutup-kelas';
+  const action = async () => {
+    const response = await Api.post(
+      path,
+      {},
+      {
+        params,
+        headers: { Authorization: user.token }
+      }
+    );
+    if (response.status <= 204) {
+      let data = response.data;
+      dispatch({
+        type: actionTypes.PRESENSI_DOSEN_SUCCESS,
+        data
+      });
+    } else {
+      const message = response.data && response.data.message;
+      throw new Error(message || 'An error has been occured');
+    }
+  };
+  dispatchAction(dispatch, actionTypes.PRESENSI_DOSEN, action, setNotif);
+};
+
+export const check = (dispatch, params) => async setNotif => {
+  const user = await getUser();
+  const path = moduleRoutes + '/find';
+  const action = async () => {
+    const response = await Api.get(path, {
+      params,
+      headers: { Authorization: user.token }
+    });
+    if (response.status <= 204) {
+      let data = response.data;
+      dispatch({
+        type: actionTypes.PRESENSI_DOSEN_SUCCESS,
+        data
+      });
+    } else {
+      const message = response.data && response.data.message;
+      throw new Error(message || 'An error has been occured');
+    }
+  };
+  dispatchAction(dispatch, actionTypes.PRESENSI_DOSEN, action, setNotif);
+};
+
+export const getReport = (dispatch, params) => async setNotif => {
+  const user = await getUser();
+
+  const action = async () => {
+    const response = await Api.get(moduleRoutes + '/report', {
+      params,
+      headers: { Authorization: user.token }
+    });
+    if (response.status <= 204) {
+      let data = response.data;
+      dispatch({
+        type: actionTypes.REPORT_PRESENSI_DOSEN_SUCCESS,
+        data
+      });
+    } else {
+      const message = response.data && response.data.message;
+      throw new Error(message || 'An error has been occured');
+    }
+  };
+  dispatchAction(dispatch, actionTypes.REPORT_PRESENSI_DOSEN, action, setNotif);
 };

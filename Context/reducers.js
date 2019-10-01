@@ -2,11 +2,13 @@
 import { errorReducer, loadingReducer } from './default/reducer';
 import {
   listPresensiDosenReducer,
-  presensiDosenReducer
+  presensiDosenReducer,
+  reportPresensiDosenReducer
 } from './presensi-dosen/reducer';
 import {
   listPresensiMahasiswaReducer,
-  presensiMahasiswaReducer
+  presensiMahasiswaReducer,
+  reportPresensiMahasiswaReducer
 } from './presensi-mahasiswa/reducer';
 
 export const reducers = {
@@ -15,7 +17,9 @@ export const reducers = {
   listPresensiDosen: listPresensiDosenReducer,
   presensiDosen: presensiDosenReducer,
   listPresensiMahasiswa: listPresensiMahasiswaReducer,
-  presensiMahasiswa: presensiMahasiswaReducer
+  presensiMahasiswa: presensiMahasiswaReducer,
+  reportPresensiDosen: reportPresensiDosenReducer,
+  reportPresensiMahasiswa: reportPresensiMahasiswaReducer
 };
 
 const combineReducers = reducer => {

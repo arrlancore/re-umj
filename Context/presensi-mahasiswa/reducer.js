@@ -26,3 +26,6 @@ export const listPresensiMahasiswaReducer = (state = null, action) =>
 
 export const presensiMahasiswaReducer = (state = null, action) =>
   setDataReducer(state, action, actionTypes.PRESENSI_MAHASISWA_SUCCESS);
+
+export const reportPresensiMahasiswaReducer = (state = null, action) =>
+  setDataReducer(state, action, actionTypes.REPORT_PRESENSI_MAHASISWA_SUCCESS);

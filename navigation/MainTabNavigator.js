@@ -4,7 +4,9 @@ import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import JadwalScreen from '../screens/JadwalScreen';
-import JadwalDetailScreen from '../screens/JadwalDetailPage';
+import JadwalDetailScreen from '../screens/JadwalDetailScreen';
+import LaporanPresensiScreen from '../screens/LaporanPresensiScreen';
+import PertemuanScreen from '../screens/PertemuanScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -24,7 +26,9 @@ const PrivateStack = createStackNavigator(
   {
     Home: HomeScreen,
     Jadwal: JadwalScreen,
-    JadwalDetail: JadwalDetailScreen
+    JadwalDetail: JadwalDetailScreen,
+    LaporanPresensi: LaporanPresensiScreen,
+    Pertemuan: PertemuanScreen
   },
   config
 );
