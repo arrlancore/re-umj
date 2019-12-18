@@ -134,11 +134,14 @@ export default function JadwalDetailScreen({ navigation }) {
     user._id
   ]);
 
-  const loadStatusPresensiMahasiswa = jadwal => { // eslint-disable-line
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadStatusPresensiMahasiswa = jadwal => {
     listMahasiswa(dispatch, { jadwal })(setSnackbar);
   };
 
-  const openCloseDialog = (currentStatus, dataMahasiswa) => { // eslint-disable-line
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const openCloseDialog = (currentStatus, dataMahasiswa) => {
+    // eslint-disable-line
     setRadioValue(currentStatus);
     setOpenDialog(!openDialog);
     setSelectedMahasiswa(dataMahasiswa);
@@ -301,12 +304,23 @@ export default function JadwalDetailScreen({ navigation }) {
                           }
                           title={`${data.mahasiswa.fullName} ${
                             data.statusPresensi
-                              ? `(${data.statusPresensi})`
-                              : ''
+                              ? `(${
+                                  data.statusPresensi
+                                }) ${data.invalidLokasi && '*'}`
+                              : '(tidak hadir)'
                           }`}
                           titleStyle={{ color: '#666', fontSize: 14 }}
                         />
                       ))}
+                    {listPresensiMahasiswa.data.filter(
+                      data => data.invalidLokasi
+                    )[0] && (
+                      <List.Item
+                        titleStyle={{ color: 'purple', fontSize: 12 }}
+                        // eslint-disable-next-line max-len
+                        title={`Cek manual dibutuhkan untuk mahasiswa bertanda *`}
+                      />
+                    )}
                   </List.Accordion>
                 )}
             </>
