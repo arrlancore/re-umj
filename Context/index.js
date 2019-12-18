@@ -5,6 +5,7 @@ import log from '../helper/prettyLog';
 
 export const DataContext = React.createContext();
 export const AuthContext = React.createContext();
+export const LocationContext = React.createContext();
 export const SnackbarContext = React.createContext();
 
 export const SnackbarProvider = props => {
@@ -16,6 +17,16 @@ export const SnackbarProvider = props => {
   );
 };
 SnackbarProvider.propTypes = { children: node };
+
+export const LocationProvider = props => {
+  const [location, setLocation] = React.useState(null);
+  return (
+    <LocationContext.Provider value={[location, setLocation]}>
+      {props.children}
+    </LocationContext.Provider>
+  );
+};
+LocationProvider.propTypes = { children: node };
 
 export const DataProvider = ({ children, reducer }) => {
   const [store, dispatch] = React.useReducer(reducer, {});

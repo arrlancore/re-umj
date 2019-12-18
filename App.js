@@ -6,7 +6,12 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import AppNavigator from './navigation/AppNavigator';
-import { AuthProvider, DataProvider, SnackbarProvider } from './Context';
+import {
+  AuthProvider,
+  DataProvider,
+  SnackbarProvider,
+  LocationProvider
+} from './Context';
 import reducers from './Context/reducers';
 
 export default function App(props) {
@@ -37,7 +42,9 @@ export default function App(props) {
           <AuthProvider>
             <DataProvider reducer={reducers}>
               <SnackbarProvider>
-                <AppNavigator />
+                <LocationProvider>
+                  <AppNavigator />
+                </LocationProvider>
               </SnackbarProvider>
             </DataProvider>
           </AuthProvider>

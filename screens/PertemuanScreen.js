@@ -8,7 +8,15 @@ import {
   View,
   KeyboardAvoidingView
 } from 'react-native';
-import { Button, TextInput, Title, List } from 'react-native-paper';
+import {
+  Button,
+  TextInput,
+  Title,
+  List,
+  Dialog,
+  Portal,
+  RadioButton
+} from 'react-native-paper';
 import headerStyle from '../components/headerStyle';
 import Layout from '../components/layout';
 import {
@@ -24,12 +32,28 @@ import {
   tutupKelas,
   check
 } from '../Context/presensi-dosen/action';
-import { list as listMahasiswa } from '../Context/presensi-mahasiswa/action';
+import {
+  update,
+  list as listMahasiswa
+} from '../Context/presensi-mahasiswa/action';
 
 export default function JadwalDetailScreen({ navigation }) {
   const { params } = navigation.state;
+  const statusKehadiran = [
+    'hadir',
+    'tidak hadir',
+    'izin',
+    'sakit',
+    'non-aktif'
+  ];
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [radioValue, setRadioValue] = React.useState(null);
+  const [selectedMahasiswa, setSelectedMahasiswa] = React.useState(null);
 
   const [, loadingPresensiDosen] = useStateDefault('LIST_PRESENSI_DOSEN');
+  const [errPresensiMahasiswa, loadingPresensiMahasiswa] = useStateDefault(
+    'PRESENSI_MAHASISWA'
+  );
 
   const [, loadingPresensiDosenActive] = useStateDefault('PRESENSI_DOSEN');
 
@@ -44,7 +68,7 @@ export default function JadwalDetailScreen({ navigation }) {
 
   const prevParams = usePrevious(params);
   const prevPresensiDosen = usePrevious(presensiDosen);
-  // const prevListPresensiMahasiswa = usePrevious(listPresensiMahasiswa);
+  const prevLoadingPresensiMahasiswa = usePrevious(loadingPresensiMahasiswa);
   const prevPresensiDosenActive = usePrevious(presensiDosenActive);
 
   React.useEffect(() => {
@@ -55,6 +79,15 @@ export default function JadwalDetailScreen({ navigation }) {
     const checkStatusPertemuanExist = params => {
       check(dispatch, params)(setSnackbar);
     };
+
+    if (
+      !loadingPresensiMahasiswa &&
+      prevLoadingPresensiMahasiswa &&
+      !errPresensiMahasiswa
+    ) {
+      openCloseDialog();
+      loadStatusPresensiMahasiswa(params._id);
+    }
 
     if (params && params._id && prevParams !== params) {
       const paramsPresensiDosen = {
@@ -86,10 +119,14 @@ export default function JadwalDetailScreen({ navigation }) {
     }
   }, [
     dispatch,
+    errPresensiMahasiswa,
     loadStatusPresensiMahasiswa,
+    loadingPresensiMahasiswa,
+    openCloseDialog,
     params,
     presensiDosen,
     presensiDosenActive,
+    prevLoadingPresensiMahasiswa,
     prevParams,
     prevPresensiDosen,
     prevPresensiDosenActive,
@@ -99,6 +136,20 @@ export default function JadwalDetailScreen({ navigation }) {
 
   const loadStatusPresensiMahasiswa = jadwal => { // eslint-disable-line
     listMahasiswa(dispatch, { jadwal })(setSnackbar);
+  };
+
+  const openCloseDialog = (currentStatus, dataMahasiswa) => { // eslint-disable-line
+    setRadioValue(currentStatus);
+    setOpenDialog(!openDialog);
+    setSelectedMahasiswa(dataMahasiswa);
+  };
+
+  const handleUpdateStatusKehadiran = () => {
+    update(
+      dispatch,
+      { statusPresensi: radioValue },
+      { id: selectedMahasiswa._id }
+    )(setSnackbar);
   };
 
   const handleMulaiKelas = () => {
@@ -127,6 +178,7 @@ export default function JadwalDetailScreen({ navigation }) {
     return 'Belum Dimulai';
   };
   const status = statusPertemuan();
+  const isSedangBerlangsung = status === 'Sedang Berlangsung';
 
   const keyClass =
     presensiDosenActive && presensiDosenActive.data
@@ -242,7 +294,11 @@ export default function JadwalDetailScreen({ navigation }) {
                       listPresensiMahasiswa.data.map((data, key) => (
                         <List.Item
                           key={key}
-                          // onPress={() => handleItemPress(jadwalData)}
+                          onPress={() =>
+                            isSedangBerlangsung
+                              ? openCloseDialog(data.statusPresensi, data)
+                              : ''
+                          }
                           title={`${data.mahasiswa.fullName} ${
                             data.statusPresensi
                               ? `(${data.statusPresensi})`
@@ -255,6 +311,55 @@ export default function JadwalDetailScreen({ navigation }) {
                 )}
             </>
           )}
+          <Portal>
+            <Dialog visible={openDialog} onDismiss={openCloseDialog}>
+              <Dialog.Title>Ubah status kehadiran</Dialog.Title>
+              <Dialog.Content>
+                {statusKehadiran.map((status, key) => (
+                  <View
+                    key={key}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      flexDirection: 'row'
+                    }}
+                  >
+                    <RadioButton.Android
+                      value={status}
+                      status={radioValue === status ? 'checked' : 'unchecked'}
+                      onPress={() => {
+                        setRadioValue(status);
+                      }}
+                    />
+                    <Text
+                      style={{ textTransform: 'capitalize', marginTop: 8 }}
+                      onPress={() => {
+                        setRadioValue(status);
+                      }}
+                    >
+                      {status}
+                    </Text>
+                  </View>
+                ))}
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button
+                  disabled={loadingPresensiMahasiswa}
+                  onPress={openCloseDialog}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  loading={loadingPresensiMahasiswa}
+                  disabled={loadingPresensiMahasiswa}
+                  onPress={handleUpdateStatusKehadiran}
+                >
+                  Update
+                </Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
         </ScrollView>
       </Layout>
     </KeyboardAvoidingView>

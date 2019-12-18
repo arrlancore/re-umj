@@ -11,7 +11,7 @@ import {
   AsyncStorage
 } from 'react-native';
 import { AuthContext, usePrevious, SnackbarContext } from '../Context';
-import { Button, TextInput, Title } from 'react-native-paper';
+import { Button, TextInput, Title, HelperText } from 'react-native-paper';
 
 const LogoImage = require('../assets/images/logo-transparent.png');
 const BgImage = require('../assets/images/bgapp.png');
@@ -23,6 +23,7 @@ export default function HomeScreen(props) {
     password: 'ftumj2019'
   });
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState({});
   const { navigate } = props.navigation;
   const [, setSnackbar] = React.useContext(SnackbarContext);
 
@@ -40,8 +41,18 @@ export default function HomeScreen(props) {
       values.email &&
       values.password &&
       values.email.length > 3 &&
-      values.password.length > 5
+      values.password.length > 5 &&
+      !Object.values(error)[0]
     );
+
+  function validateEmail(email) {
+    // eslint-disable-next-line
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (re.test(email)) {
+      return setError({});
+    }
+    setError({ email: 'Email tidak valid' });
+  }
 
   const userLogin = async () => {
     setLoading(true);
@@ -68,10 +79,16 @@ export default function HomeScreen(props) {
         throw new Error('An error has been occured during the login');
       }
     } catch (error) {
+      const errorMessage =
+        (error.response.data && error.response.data.message) || error.message;
       console.log(error);
       setLoading(false);
-      setSnackbar(error.message);
+      setSnackbar(errorMessage);
     }
+  };
+
+  const emailValidator = () => {
+    validateEmail(values.email);
   };
 
   return (
@@ -86,6 +103,9 @@ export default function HomeScreen(props) {
           <Image style={{ width: 120, height: 120 }} source={LogoImage} />
         </View>
 
+        <HelperText type="error" visible={!!Object.values(error)[0]}>
+          {Object.values(error)[0]}
+        </HelperText>
         <TextInput
           onChangeText={value => setValue('email')(value)}
           style={styles.inputStyle}
@@ -94,6 +114,8 @@ export default function HomeScreen(props) {
           value={values.email}
           autoCompleteType="email"
           keyboardType="email-address"
+          onBlur={emailValidator}
+          error={true}
         />
         <TextInput
           onChangeText={value => setValue('password')(value)}

@@ -28,6 +28,8 @@ import {
   viewByParam
 } from '../Context/presensi-mahasiswa/action';
 
+import { LocationContext } from '../Context';
+
 export default function JadwalDetailScreen({ navigation }) {
   const { params } = navigation.state;
 
@@ -44,12 +46,17 @@ export default function JadwalDetailScreen({ navigation }) {
   const [, loadingPresensiMahasiswa] = useStateDefault('PRESENSI_MAHASISWA');
 
   const [, setSnackbar] = React.useContext(SnackbarContext);
+  const [locationContext, setLocationContext] = React.useContext(
+    LocationContext
+  );
   const { user } = React.useContext(AuthContext);
   const [presensiDosen, dispatch] = useDataContext('listPresensiDosen');
   const [presensiMahasiswa] = useDataContext('presensiMahasiswa');
 
   // eslint-disable-next-line
-  const getLocation = async () => {
+  const getLocation = async (reload = false) => {
+    if (reload) setLocation('reloading..');
+    if (locationContext && !reload) return setLocation(locationContext);
     if (Platform.OS === 'android' && !Constants.isDevice) {
       setLocation('unaivailable');
       setSnackbar(
@@ -63,22 +70,22 @@ export default function JadwalDetailScreen({ navigation }) {
         setSnackbar('Permission to access location was denied');
       }
       let location = await Location.getCurrentPositionAsync({});
+      setLocationContext(location.coords);
       setLocation(location.coords);
     }
   };
 
   const prevParams = usePrevious(params);
+  const prevLocation = usePrevious(location);
   const prevPresensiDosen = usePrevious(presensiDosen);
   const prevPresensiMahasiswa = usePrevious(presensiMahasiswa);
 
   React.useEffect(() => {
     const loadStatusPresensiDosen = jadwal => {
-      console.log('TCL: JadwalDetailScreen -> jadwal', jadwal);
       list(dispatch, { jadwal, select: 'isActive' })(setSnackbar);
     };
 
     const loadStatusPresensiMahasiswa = jadwal => {
-      console.log('TCL: JadwalDetailScreen -> jadwal', jadwal);
       viewByParam(dispatch, { jadwal, mahasiswa: user._id })(setSnackbar);
     };
 
@@ -95,14 +102,14 @@ export default function JadwalDetailScreen({ navigation }) {
       loadStatusPresensiMahasiswa(params._id);
     }
 
-    if (!location) {
+    if (!location && location !== prevLocation) {
       getLocation();
     }
 
     if (presensiMahasiswa && prevPresensiMahasiswa !== presensiMahasiswa) {
       let statuses = 'Belum Ada';
-      if (presensiMahasiswa.data !== null) {
-        if (presensiMahasiswa.data.statusPresensi) {
+      if (typeof presensiMahasiswa.data === 'object') {
+        if (presensiMahasiswa.data && presensiMahasiswa.data.statusPresensi) {
           statuses = presensiMahasiswa.data.statusPresensi;
           if (presensiMahasiswa.message) {
             setSnackbar(presensiMahasiswa.message);
@@ -118,6 +125,7 @@ export default function JadwalDetailScreen({ navigation }) {
     params,
     presensiDosen,
     presensiMahasiswa,
+    prevLocation,
     prevParams,
     prevPresensiDosen,
     prevPresensiMahasiswa,
@@ -220,9 +228,14 @@ export default function JadwalDetailScreen({ navigation }) {
               </View>
 
               <View style={styles.viewField}>
-                <Text style={styles.textField}>Koordinat Lokasi</Text>
-                <Text>
-                  {location && typeof ocation !== 'string'
+                <Text
+                  onPress={() => getLocation(true)}
+                  style={styles.textField}
+                >
+                  Koordinat Lokasi
+                </Text>
+                <Text onPress={() => getLocation(true)}>
+                  {location && typeof location !== 'string'
                     ? `${location.latitude},${location.longitude}`
                     : location}
                 </Text>
